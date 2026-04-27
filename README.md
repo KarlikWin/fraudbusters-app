@@ -1,7 +1,4 @@
-# FraudBusters — Deployed App (Week 4)
-
-Streamlit web app that wraps the Week 3 best model (cost-sensitive XGBoost) and
-exposes it as a public fraud-detection service with SHAP explanations.
+# FraudBusters — Deployed App 
 
 ## Layout
 
@@ -17,56 +14,8 @@ deployed_app/
     └── background_sample.npy
 ```
 
-## 1. Local run
-
-```powershell
-# from projectML/deployed_app/
-python train_model.py          # one-off, writes models/
-streamlit run app.py
-```
-
-The app opens at <http://localhost:8501>. It accepts:
-
-- **Time + Amount** as numeric inputs
-- **V1 – V28** (PCA components) as sliders — defaults are training-set medians
-- **Paste mode**: comma-separated row of 30 values (one full CSV record)
-
 Outputs:
 
 - Fraud probability + decision (threshold tuned on test PR curve)
+- **Global SHAP** importance on background sample
 - **Local SHAP waterfall** with top-3 driver explanation in plain English
-- Optional **global SHAP** importance on background sample
-
-## 2. Deploy to Streamlit Community Cloud (recommended, free)
-
-1. Push `projectML/deployed_app/` to a public GitHub repo, e.g.
-   `Team19-FraudBusters/fraud-app`. Commit the trained `models/` folder so the
-   cloud worker doesn't need the dataset.
-2. Sign in at <https://streamlit.io/cloud> with GitHub.
-3. **New app** → pick the repo → main file path: `app.py` → Deploy.
-4. Public URL appears within ~2 min, looks like
-   `https://team19-fraudbusters.streamlit.app`.
-
-> ⚠ The Kaggle CSV (`creditcard.csv`, ~150 MB) must NOT be committed — only the
-> trained `models/` artefacts (~5 MB) need to be in the repo.
-
-## 3. Alternative: HuggingFace Spaces
-
-1. Create a new **Space** → SDK = **Streamlit** → hardware = **CPU basic** (free).
-2. Upload the same files (`app.py`, `requirements.txt`, `models/`).
-3. The Space auto-builds and serves at `https://huggingface.co/spaces/<user>/fraudbusters`.
-
-## 4. Backup plan (per Week 4 rubric)
-
-- Record a 60-second screen capture of the live app to MP4.
-- Export the Streamlit page to a static HTML via the browser (`Save as → Webpage, complete`).
-- Keep both on a USB stick on presentation day.
-
-## Submission checklist (Week 4 rubric)
-
-- [x] App accepts user input
-- [x] App returns model prediction
-- [x] App displays SHAP explanation
-- [ ] Public URL submitted via course platform
-- [ ] App tested from a different device + network
-- [ ] Backup demo prepared
