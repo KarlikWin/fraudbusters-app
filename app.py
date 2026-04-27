@@ -19,6 +19,7 @@ import pandas as pd
 import shap
 import streamlit as st
 import matplotlib.pyplot as plt
+from sklearn.pipeline import Pipeline
 
 HERE = Path(__file__).parent
 MODELS_DIR = HERE / "models"
@@ -40,9 +41,10 @@ def load_artifacts():
 
 @st.cache_resource(show_spinner="Initialising SHAP explainer...")
 def build_explainer(_pipeline, _background, feature_names):
-    # Use the fitted booster directly on preprocessed input → fast TreeExplainer
-    preprocessor = _pipeline.named_steps["preprocessor"]
+    # Pipeline = [imputer, scaler, classifier]. Re-use the first two steps as
+    # the "preprocessor" for SHAP input.
     classifier = _pipeline.named_steps["classifier"]
+    preprocessor = Pipeline(_pipeline.steps[:-1])
     bg_df = pd.DataFrame(_background, columns=feature_names)
     bg_transformed = preprocessor.transform(bg_df)
     explainer = shap.TreeExplainer(

@@ -21,7 +21,6 @@ from pathlib import Path
 import joblib
 import numpy as np
 import pandas as pd
-from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import (
     average_precision_score,
@@ -69,16 +68,9 @@ def main() -> None:
     scale_pos_weight = float((y_train == 0).sum() / (y_train == 1).sum())
     print(f"scale_pos_weight = {scale_pos_weight:.2f}")
 
-    preprocessor = ColumnTransformer(
-        [(
-            "num",
-            Pipeline([
-                ("imputer", SimpleImputer(strategy="median")),
-                ("scaler", StandardScaler()),
-            ]),
-            feature_cols,
-        )]
-    )
+    # Plain Pipeline (no ColumnTransformer) — all 30 features are numeric and
+    # share the same preprocessing. Avoids brittle private sklearn classes
+    # (_RemainderColsList) that break across minor releases.
 
     # Best XGB params from Week 3 tuning
     classifier = XGBClassifier(
@@ -97,7 +89,8 @@ def main() -> None:
     )
 
     pipeline = Pipeline([
-        ("preprocessor", preprocessor),
+        ("imputer", SimpleImputer(strategy="median")),
+        ("scaler", StandardScaler()),
         ("classifier", classifier),
     ])
 
